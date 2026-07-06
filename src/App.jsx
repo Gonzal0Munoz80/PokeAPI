@@ -1,23 +1,14 @@
 import { useEffect, useState } from 'react'
 import './App.css'
+import useLocalStorage from './hooks/useLocalStorage'
+import SearchBar from './components/SearchBar'
+import PokemonCard from './components/PokemonCard'
 
 function App() {
   const [pokemons, setPokemons] = useState([])
   const [filter, setFilter] = useState('')
-  const [favorites, setFavorites] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('favorites') || '[]')
-    } catch {
-      return []
-    }
-  })
-  const [blocked, setBlocked] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('blocked') || '[]')
-    } catch {
-      return []
-    }
-  })
+  const [favorites, setFavorites] = useLocalStorage('favorites', [])
+  const [blocked, setBlocked] = useLocalStorage('blocked', [])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -88,19 +79,6 @@ function App() {
     setFavorites((currentFavorites) => currentFavorites.filter((item) => item !== id))
   }
 
-  // persist favorites and blocked to localStorage
-  useEffect(() => {
-    try {
-      localStorage.setItem('favorites', JSON.stringify(favorites))
-    } catch {}
-  }, [favorites])
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('blocked', JSON.stringify(blocked))
-    } catch {}
-  }, [blocked])
-
   // ensure favorites do not contain blocked ids (in case localStorage had both)
   useEffect(() => {
     if (blocked.length === 0) return
@@ -113,6 +91,7 @@ function App() {
         <p className="eyebrow">PokeAPI</p>
         <h1>Catálogo de Pokémon</h1>
         <p className="subtitle">Datos cargados desde la API pública de Pokémon, con imágenes y tipos.</p>
+        <p className="members">Integrantes: Gonzalo Muñoz</p>
       </header>
 
       {loading ? (
@@ -121,15 +100,7 @@ function App() {
         <div className="status error">Error: {error}</div>
       ) : (
         <>
-          <div className="search-bar">
-            <input
-              type="search"
-              value={filter}
-              onChange={(event) => setFilter(event.target.value)}
-              placeholder="Buscar Pokémon por nombre o tipo"
-              aria-label="Buscar Pokémon"
-            />
-          </div>
+          <SearchBar filter={filter} setFilter={setFilter} />
 
           <div className="summary-bar">
             <span>Total: {pokemons.length}</span>
@@ -141,42 +112,15 @@ function App() {
             <div className="status">No se encontró ningún Pokémon para "{filter}".</div>
           ) : (
             <section className="pokemon-grid">
-              {visiblePokemons.map((pokemon) => {
-                const isFavorite = favorites.includes(pokemon.id)
-                const isBlocked = blocked.includes(pokemon.id)
-
-                return (
-                  <article key={pokemon.id} className="pokemon-card">
-                    <div className="card-image">
-                      <img src={pokemon.image} alt={pokemon.name} loading="lazy" />
-                    </div>
-                    <div className="card-body">
-                      <div className="card-top">
-                        <span className="pokemon-id">#{pokemon.id.toString().padStart(3, '0')}</span>
-                        {isFavorite && <span className="badge">Favorito</span>}
-                      </div>
-                      <h2>{pokemon.name}</h2>
-                      <p className="pokemon-type">Tipo: {pokemon.type}</p>
-                      <div className="card-actions">
-                        <button
-                          type="button"
-                          className={`button button-favorite ${isFavorite ? 'active' : ''}`}
-                          onClick={() => handleToggleFavorite(pokemon.id)}
-                        >
-                          {isFavorite ? 'Quitar favorito' : 'Marcar favorito'}
-                        </button>
-                        <button
-                          type="button"
-                          className="button button-block"
-                          onClick={() => handleToggleBlocked(pokemon.id)}
-                        >
-                          Bloquear
-                        </button>
-                      </div>
-                    </div>
-                  </article>
-                )
-              })}
+              {visiblePokemons.map((pokemon) => (
+                <PokemonCard
+                  key={pokemon.id}
+                  pokemon={pokemon}
+                  isFavorite={favorites.includes(pokemon.id)}
+                  onToggleFavorite={handleToggleFavorite}
+                  onToggleBlocked={handleToggleBlocked}
+                />
+              ))}
             </section>
           )}
 
