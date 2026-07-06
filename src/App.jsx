@@ -4,6 +4,8 @@ import './App.css'
 function App() {
   const [pokemons, setPokemons] = useState([])
   const [filter, setFilter] = useState('')
+  const [favorites, setFavorites] = useState([])
+  const [blocked, setBlocked] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -46,13 +48,33 @@ function App() {
   }, [])
 
   const normalizedFilter = filter.trim().toLowerCase()
-  const filteredPokemons = pokemons.filter((pokemon) => {
-    return (
-      normalizedFilter === '' ||
-      pokemon.name.toLowerCase().includes(normalizedFilter) ||
-      pokemon.type.toLowerCase().includes(normalizedFilter)
+  const visiblePokemons = pokemons
+    .filter((pokemon) => !blocked.includes(pokemon.id))
+    .filter((pokemon) => {
+      return (
+        normalizedFilter === '' ||
+        pokemon.name.toLowerCase().includes(normalizedFilter) ||
+        pokemon.type.toLowerCase().includes(normalizedFilter)
+      )
+    })
+
+  const blockedPokemons = pokemons.filter((pokemon) => blocked.includes(pokemon.id))
+
+  const handleToggleFavorite = (id) => {
+    setFavorites((current) =>
+      current.includes(id) ? current.filter((item) => item !== id) : [...current, id],
     )
-  })
+  }
+
+  const handleToggleBlocked = (id) => {
+    setBlocked((currentBlocked) =>
+      currentBlocked.includes(id)
+        ? currentBlocked.filter((item) => item !== id)
+        : [...currentBlocked, id],
+    )
+
+    setFavorites((currentFavorites) => currentFavorites.filter((item) => item !== id))
+  }
 
   return (
     <main className="app-shell">
@@ -78,22 +100,72 @@ function App() {
             />
           </div>
 
-          {filteredPokemons.length === 0 ? (
+          <div className="summary-bar">
+            <span>{visiblePokemons.length} Pokémon visibles</span>
+            <span>{favorites.length} favoritos</span>
+            <span>{blockedPokemons.length} bloqueados</span>
+          </div>
+
+          {visiblePokemons.length === 0 ? (
             <div className="status">No se encontró ningún Pokémon para "{filter}".</div>
           ) : (
             <section className="pokemon-grid">
-              {filteredPokemons.map((pokemon) => (
-                <article key={pokemon.id} className="pokemon-card">
-                  <div className="card-image">
-                    <img src={pokemon.image} alt={pokemon.name} loading="lazy" />
-                  </div>
-                  <div className="card-body">
-                    <span className="pokemon-id">#{pokemon.id.toString().padStart(3, '0')}</span>
-                    <h2>{pokemon.name}</h2>
-                    <p className="pokemon-type">Tipo: {pokemon.type}</p>
-                  </div>
-                </article>
-              ))}
+              {visiblePokemons.map((pokemon) => {
+                const isFavorite = favorites.includes(pokemon.id)
+                const isBlocked = blocked.includes(pokemon.id)
+
+                return (
+                  <article key={pokemon.id} className="pokemon-card">
+                    <div className="card-image">
+                      <img src={pokemon.image} alt={pokemon.name} loading="lazy" />
+                    </div>
+                    <div className="card-body">
+                      <div className="card-top">
+                        <span className="pokemon-id">#{pokemon.id.toString().padStart(3, '0')}</span>
+                        {isFavorite && <span className="badge">Favorito</span>}
+                      </div>
+                      <h2>{pokemon.name}</h2>
+                      <p className="pokemon-type">Tipo: {pokemon.type}</p>
+                      <div className="card-actions">
+                        <button
+                          type="button"
+                          className={`button button-favorite ${isFavorite ? 'active' : ''}`}
+                          onClick={() => handleToggleFavorite(pokemon.id)}
+                        >
+                          {isFavorite ? 'Quitar favorito' : 'Marcar favorito'}
+                        </button>
+                        <button
+                          type="button"
+                          className="button button-block"
+                          onClick={() => handleToggleBlocked(pokemon.id)}
+                        >
+                          Bloquear
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                )
+              })}
+            </section>
+          )}
+
+          {blockedPokemons.length > 0 && (
+            <section className="blocked-list">
+              <h2>Pokémon bloqueados</h2>
+              <div className="blocked-grid">
+                {blockedPokemons.map((pokemon) => (
+                  <article key={pokemon.id} className="blocked-card">
+                    <span className="blocked-name">{pokemon.name}</span>
+                    <button
+                      type="button"
+                      className="button button-secondary"
+                      onClick={() => handleToggleBlocked(pokemon.id)}
+                    >
+                      Desbloquear
+                    </button>
+                  </article>
+                ))}
+              </div>
             </section>
           )}
         </>
