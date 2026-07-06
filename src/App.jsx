@@ -4,8 +4,20 @@ import './App.css'
 function App() {
   const [pokemons, setPokemons] = useState([])
   const [filter, setFilter] = useState('')
-  const [favorites, setFavorites] = useState([])
-  const [blocked, setBlocked] = useState([])
+  const [favorites, setFavorites] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('favorites') || '[]')
+    } catch {
+      return []
+    }
+  })
+  const [blocked, setBlocked] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('blocked') || '[]')
+    } catch {
+      return []
+    }
+  })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -76,6 +88,25 @@ function App() {
     setFavorites((currentFavorites) => currentFavorites.filter((item) => item !== id))
   }
 
+  // persist favorites and blocked to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('favorites', JSON.stringify(favorites))
+    } catch {}
+  }, [favorites])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('blocked', JSON.stringify(blocked))
+    } catch {}
+  }, [blocked])
+
+  // ensure favorites do not contain blocked ids (in case localStorage had both)
+  useEffect(() => {
+    if (blocked.length === 0) return
+    setFavorites((current) => current.filter((id) => !blocked.includes(id)))
+  }, [blocked])
+
   return (
     <main className="app-shell">
       <header className="hero">
@@ -101,9 +132,9 @@ function App() {
           </div>
 
           <div className="summary-bar">
-            <span>{visiblePokemons.length} Pokémon visibles</span>
-            <span>{favorites.length} favoritos</span>
-            <span>{blockedPokemons.length} bloqueados</span>
+            <span>Total: {pokemons.length}</span>
+            <span>Favoritos: {favorites.length}</span>
+            <span>Bloqueados: {blocked.length}</span>
           </div>
 
           {visiblePokemons.length === 0 ? (
