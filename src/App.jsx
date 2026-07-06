@@ -3,6 +3,7 @@ import './App.css'
 
 function App() {
   const [pokemons, setPokemons] = useState([])
+  const [filter, setFilter] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -44,6 +45,15 @@ function App() {
     loadPokemons()
   }, [])
 
+  const normalizedFilter = filter.trim().toLowerCase()
+  const filteredPokemons = pokemons.filter((pokemon) => {
+    return (
+      normalizedFilter === '' ||
+      pokemon.name.toLowerCase().includes(normalizedFilter) ||
+      pokemon.type.toLowerCase().includes(normalizedFilter)
+    )
+  })
+
   return (
     <main className="app-shell">
       <header className="hero">
@@ -57,24 +67,36 @@ function App() {
       ) : error ? (
         <div className="status error">Error: {error}</div>
       ) : (
-        <section className="pokemon-grid">
-          {pokemons.map((pokemon) => (
-            <article key={pokemon.id} className="pokemon-card">
-              <div className="card-image">
-                <img
-                  src={pokemon.image}
-                  alt={pokemon.name}
-                  loading="lazy"
-                />
-              </div>
-              <div className="card-body">
-                <span className="pokemon-id">#{pokemon.id.toString().padStart(3, '0')}</span>
-                <h2>{pokemon.name}</h2>
-                <p className="pokemon-type">Tipo: {pokemon.type}</p>
-              </div>
-            </article>
-          ))}
-        </section>
+        <>
+          <div className="search-bar">
+            <input
+              type="search"
+              value={filter}
+              onChange={(event) => setFilter(event.target.value)}
+              placeholder="Buscar Pokémon por nombre o tipo"
+              aria-label="Buscar Pokémon"
+            />
+          </div>
+
+          {filteredPokemons.length === 0 ? (
+            <div className="status">No se encontró ningún Pokémon para "{filter}".</div>
+          ) : (
+            <section className="pokemon-grid">
+              {filteredPokemons.map((pokemon) => (
+                <article key={pokemon.id} className="pokemon-card">
+                  <div className="card-image">
+                    <img src={pokemon.image} alt={pokemon.name} loading="lazy" />
+                  </div>
+                  <div className="card-body">
+                    <span className="pokemon-id">#{pokemon.id.toString().padStart(3, '0')}</span>
+                    <h2>{pokemon.name}</h2>
+                    <p className="pokemon-type">Tipo: {pokemon.type}</p>
+                  </div>
+                </article>
+              ))}
+            </section>
+          )}
+        </>
       )}
     </main>
   )

@@ -69,6 +69,30 @@ body {
   line-height: 1.7;
 }
 
+.search-bar {
+  display: flex;
+  justify-content: center;
+  margin: 0 auto;
+  max-width: 560px;
+}
+
+.search-bar input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 14px 18px;
+  font-size: 1rem;
+  color: var(--text);
+  background: var(--surface);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-bar input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+}
+
 .status {
   padding: 24px;
   border-radius: 20px;
