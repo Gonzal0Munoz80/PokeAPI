@@ -45,6 +45,12 @@ body {
   gap: 28px;
 }
 
+.main-container {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 24px;
+}
+
 .hero {
   padding: 24px 20px;
   background: linear-gradient(90deg, rgba(37,99,235,0.06), rgba(124,58,237,0.04));
@@ -374,6 +380,14 @@ h1, h2 {
   .card-actions {
     flex-direction: column;
   }
+
+  .main-container {
+    grid-template-columns: 1fr;
+  }
+
+  .favorites-panel {
+    order: -1;
+  }
 }
 
 @media (max-width: 420px) {
@@ -396,4 +410,124 @@ h1, h2 {
   margin: 0;
   color: var(--text-muted);
   line-height: 1.6;
+}
+
+.content-left {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.favorites-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px;
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+  box-shadow: 0 6px 18px rgba(16,24,40,0.04);
+}
+
+.favorites-panel h2 {
+  margin: 0 0 16px;
+  font-size: 1.2rem;
+  color: var(--text-h);
+}
+
+.empty-message {
+  margin: 0;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 20px 0;
+  font-size: 0.95rem;
+}
+
+.favorites-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.favorite-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  background: linear-gradient(135deg, rgba(37,99,235,0.04), rgba(124,58,237,0.02));
+  border: 1px solid rgba(37,99,235,0.12);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.favorite-item:hover {
+  background: linear-gradient(135deg, rgba(37,99,235,0.08), rgba(124,58,237,0.05));
+  border-color: rgba(37,99,235,0.2);
+}
+
+.favorite-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.favorite-id {
+  display: inline-flex;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--accent-soft);
+  color: var(--accent-2);
+  font-size: 0.75rem;
+  font-weight: 700;
+  width: fit-content;
+}
+
+.favorite-name {
+  margin: 0;
+  font-weight: 700;
+  text-transform: capitalize;
+  color: var(--text-h);
+  font-size: 0.95rem;
+}
+
+.favorite-type {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.button-remove-favorite {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(220, 38, 38, 0.1);
+  color: #b91c1c;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.button-remove-favorite:hover {
+  background: rgba(220, 38, 38, 0.2);
+  transform: scale(1.1);
+}
+
+.button-remove-favorite:active {
+  transform: scale(0.95);
 }

@@ -108,41 +108,75 @@ function App() {
             <span>Bloqueados: {blocked.length}</span>
           </div>
 
-          {visiblePokemons.length === 0 ? (
-            <div className="status">No se encontró ningún Pokémon para "{filter}".</div>
-          ) : (
-            <section className="pokemon-grid">
-              {visiblePokemons.map((pokemon) => (
-                <PokemonCard
-                  key={pokemon.id}
-                  pokemon={pokemon}
-                  isFavorite={favorites.includes(pokemon.id)}
-                  onToggleFavorite={handleToggleFavorite}
-                  onToggleBlocked={handleToggleBlocked}
-                />
-              ))}
-            </section>
-          )}
+          <div className="main-container">
+            <div className="content-left">
+              {visiblePokemons.length === 0 ? (
+                <div className="status">No se encontró ningún Pokémon para "{filter}".</div>
+              ) : (
+                <section className="pokemon-grid">
+                  {visiblePokemons.map((pokemon) => (
+                    <PokemonCard
+                      key={pokemon.id}
+                      pokemon={pokemon}
+                      isFavorite={favorites.includes(pokemon.id)}
+                      onToggleFavorite={handleToggleFavorite}
+                      onToggleBlocked={handleToggleBlocked}
+                    />
+                  ))}
+                </section>
+              )}
 
-          {blockedPokemons.length > 0 && (
-            <section className="blocked-list">
-              <h2>Pokémon bloqueados</h2>
-              <div className="blocked-grid">
-                {blockedPokemons.map((pokemon) => (
-                  <article key={pokemon.id} className="blocked-card">
-                    <span className="blocked-name">{pokemon.name}</span>
-                    <button
-                      type="button"
-                      className="button button-secondary"
-                      onClick={() => handleToggleBlocked(pokemon.id)}
-                    >
-                      Desbloquear
-                    </button>
-                  </article>
-                ))}
-              </div>
-            </section>
-          )}
+              {blockedPokemons.length > 0 && (
+                <section className="blocked-list">
+                  <h2>Pokémon bloqueados</h2>
+                  <div className="blocked-grid">
+                    {blockedPokemons.map((pokemon) => (
+                      <article key={pokemon.id} className="blocked-card">
+                        <span className="blocked-name">{pokemon.name}</span>
+                        <button
+                          type="button"
+                          className="button button-secondary"
+                          onClick={() => handleToggleBlocked(pokemon.id)}
+                        >
+                          Desbloquear
+                        </button>
+                      </article>
+                    ))}
+                  </div>
+                </section>
+              )}
+            </div>
+
+            <aside className="favorites-panel">
+              <h2>Favoritos</h2>
+              {favorites.length === 0 ? (
+                <p className="empty-message">No tienes favoritos aún.</p>
+              ) : (
+                <div className="favorites-list">
+                  {favorites.map((favId) => {
+                    const pokemon = pokemons.find((p) => p.id === favId)
+                    return pokemon ? (
+                      <div key={pokemon.id} className="favorite-item">
+                        <div className="favorite-info">
+                          <span className="favorite-id">#{pokemon.id.toString().padStart(3, '0')}</span>
+                          <p className="favorite-name">{pokemon.name}</p>
+                          <p className="favorite-type">{pokemon.type}</p>
+                        </div>
+                        <button
+                          type="button"
+                          className="button-remove-favorite"
+                          onClick={() => handleToggleFavorite(pokemon.id)}
+                          title="Quitar favorito"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ) : null
+                  })}
+                </div>
+              )}
+            </aside>
+          </div>
         </>
       )}
     </main>
