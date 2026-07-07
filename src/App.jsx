@@ -157,6 +157,7 @@ function App() {
                     const pokemon = pokemons.find((p) => p.id === favId)
                     return pokemon ? (
                       <div key={pokemon.id} className="favorite-item">
+                        <img src={pokemon.image} alt={pokemon.name} className="favorite-image" loading="lazy" />
                         <div className="favorite-info">
                           <span className="favorite-id">#{pokemon.id.toString().padStart(3, '0')}</span>
                           <p className="favorite-name">{pokemon.name}</p>
